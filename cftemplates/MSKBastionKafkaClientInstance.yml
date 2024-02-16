@@ -33,6 +33,7 @@ Resources:
     Properties: 
       AutomaticStopTimeMinutes: 600
       Description: "Cloud9 EC2 environment"
+      ImageId: resolve:ssm:/aws/service/cloud9/amis/amazonlinux-2023-x86_64
       InstanceType: m5.large
       Name: !Sub "${AWS::StackName}-Cloud9EC2Bastion"
       SubnetId: 
