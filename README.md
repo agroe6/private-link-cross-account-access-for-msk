@@ -58,11 +58,11 @@ In Account A, Deploy the CloudFormation template
 
 ### 2. Setup NLBs and Endpoint service in Account A
 
-2a. Package the jar file locally
+      2a. Package the jar file locally
 
 Within the main directory of your cloned repository, run mvn clean package to have Maven package the dependencies defined in the pom.xml file into a jar. If you're new to using Maven with the AWS SDK, read more about getting started [here](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/setup-project-maven.html#prerequisitesmaven).
 
-2b. Run the jar to create the NLB, Target groups, VPC endpoint service for each NLB and Dynamo DB table with this information
+      2b. Run the jar to create the NLB, Target groups, VPC endpoint service for each NLB and Dynamo DB table with this information
 
     java -jar PrivateLinkCrossAccount-1.0-SNAPSHOT.jar \
         --mskClusterArn <cluster_arn> --region <region_name> \
