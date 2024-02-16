@@ -117,7 +117,7 @@ In Account B:
             --capabilities CAPABILITY_IAM --profile <mskclient_profile_name>
         ```
 
-      Here Parameter value for KeyName is the name of a key pair that will act as the security credentials for the MSK Client being created by this CloudFormation stack. You can either create a new key pair for this client or use an existing key pair in your AWS Account. To read more about creating or listing key pairs on AWS, see [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html). 
+      Here Parameter value for KeyName is the name of a key pair that will act as the security credentials for the MSK Client being created by this CloudFormation stack. You can either create a new key pair for this client instance or use an existing key pair in your AWS Account. To read more about creating or programmatically listing key pairs on AWS, see [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html). 
 
    3. Create a Route53 private hosted Zone in client account.
 
