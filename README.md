@@ -15,8 +15,14 @@ The code accepts a number of parameters, but the following are the important one
 1.	mskClusterArn – This is the Amazon Resource Name (ARN) of the Amazon MSK cluster in Account A
 2.	region – This is the AWS Region where the code is running.
 3.	allowedPrincipal – This is an important parameter and refers to the identity principal in Account B that has access to the endpoint service in Account A, and can be IAM users, IAM roles or AWS Accounts. For more information, see endpoint service permissions.
-4.	lbListenerPort: This is the port the NLB listeners for each Amazon MSK broker will be listening on. For TLS connections, it should be 9094, and for PLAINTEXT, it should be 9092.
-5.	targetPort: This is the port the target group associated with each NLB listener will be forwarding the request to the associated target, in this case, the IPv4 address of the Amazon MSK broker ENI.
+
+For this sample, let's say we have an IAM User setup in both Account A and Account B with Admin privileges (although when used in production or sensitive environments, AWS recommends implementing [least privilege permissions](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege) for entities accessing your account). You can generate access keys associated with these users, which you can use in your local environment to setup your AWS access profiles. See more about using profiles with the AWS CLI [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-format).
+
+To create IAM Users in the AWS Console read more [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html#id_users_create_console). 
+To create IAM Users programmatically read more [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html#id_users_create_cliwpsapi). 
+
+5.	lbListenerPort: This is the port the NLB listeners for each Amazon MSK broker will be listening on. For TLS connections, it should be 9094, and for PLAINTEXT, it should be 9092.
+6.	targetPort: This is the port the target group associated with each NLB listener will be forwarding the request to the associated target, in this case, the IPv4 address of the Amazon MSK broker ENI.
       
 The Java code also creates a DynamoDB table and updates it with information on the created endpoint services, 
 including the broker id, the DNS name of the service endpoint, the NLB name, and the DNS name of the Amazon MSK broker endpoint. 
@@ -48,22 +54,23 @@ In Account A, Deploy the CloudFormation template
         --stack-name MSKCluster \
         --template-file cftemplates/MSKClusterWithVPC.yml \
         --capabilities CAPABILITY_IAM
- 
-   
+        
 
 ### 2. Setup NLBs and Endpoint service in Account A
 
-Package the jar file and run it to create the NLB, Target groups, VPC endpoint service for each NLB and Dynamo DB table with this information
+2a. Package the jar file locally
+
+Within the main directory of your cloned repository, run mvn clean package to have Maven package the dependencies defined in the pom.xml file into a jar. If you're new to using Maven with the AWS SDK, read more about getting started [here](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/setup-project-maven.html#prerequisitesmaven).
+
+2b. Run the jar to create the NLB, Target groups, VPC endpoint service for each NLB and Dynamo DB table with this information
 
     java -jar PrivateLinkCrossAccount-1.0-SNAPSHOT.jar \
         --mskClusterArn <cluster_arn> --region <region_name> \
         --allowedPrincipal <role_arn> --targetPort <port_num> \
         --lbListenerPort <port_num>
-
     
-
    mskClusterArn is the ARN of you MSK cluster (required), 
-   allowedPrincipal is the identity principal in Account B that has access to the endpoint service in Account A, and can be IAM users, IAM roles or AWS Accounts,
+   allowedPrincipal is the identity principal in Account B that has access to the endpoint service in Account A, and can be **IAM users**, IAM roles or AWS Accounts,
    region is the region your cluster is in (assumes us-east-1 if not provided), 
    targetPort is the port your MSK cluster Nodes are listening on (defaults to 9094), 
    lbListenerPort is the port that NLB listeners should listen on (defaults to 9094)
@@ -109,6 +116,8 @@ In Account B:
             --parameter-overrides  KeyName=<ec2_keypair> \
             --capabilities CAPABILITY_IAM --profile <mskclient_profile_name>
         ```
+
+      Here Parameter value for KeyName is the name of a key pair that will act as the security credentials for the MSK Client being created by this CloudFormation stack. You can either create a new key pair for this client or use an existing key pair in your AWS Account. To read more about creating or listing key pairs on AWS, see [here](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html). 
 
    3. Create a Route53 private hosted Zone in client account.
 
